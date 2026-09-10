@@ -1,6 +1,8 @@
 package com.myFullstack.employee_management.controllers;
 
 import com.myFullstack.employee_management.entities.Employee;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -35,31 +37,35 @@ public class EmployeeController {
 
 
     @GetMapping
-    public ArrayList<Employee> hello() {
-        return employees;
+    public ResponseEntity<ArrayList<Employee>> hello() {
+        return new ResponseEntity<ArrayList<Employee>>(employees, HttpStatus.OK);
 
     }
 
     @GetMapping("/{employeeId}")
-    public Optional<Employee> findEmployee(@PathVariable UUID employeeId) {
+    public ResponseEntity<Employee> findEmployee(@PathVariable UUID employeeId) {
         Optional<Employee> employee = employees.stream()
                 .filter(emp -> emp.getId().equals(employeeId))
                 .findFirst();
-        return employee;
+
+        if (employee.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<Employee>(employee.get(), HttpStatus.OK);
     }
 
     @PostMapping
-    public Employee createOne(@RequestBody Employee employee) {
+    public ResponseEntity<Employee> createOne(@RequestBody Employee employee) {
 
         employee.setId(UUID.randomUUID());
         employee.setDepartmentId(UUID.randomUUID());
         employees.add(employee);
 
-        return employee;
+        return new ResponseEntity<Employee>(employee, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{employeeId}")
-    public void deleteOne(@PathVariable UUID employeeId) {
+    public ResponseEntity<Void> deleteOne(@PathVariable UUID employeeId) {
 
         Optional<Employee> employee = employees.stream()
                 .filter(emp -> emp.getId().equals(employeeId))
@@ -68,25 +74,30 @@ public class EmployeeController {
         if (employee.isPresent()) {
             employees.remove(employee.get());
         }
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{employeeId}")
-    public Employee updateOne(@PathVariable UUID employeeId,
-                              @RequestBody Employee employee) {
+    public ResponseEntity<Optional<Employee>> updateOne(@PathVariable UUID employeeId,
+                                                        @RequestBody Employee employee) {
 
         Optional<Employee> existingEmployee = employees.stream()
                 .filter(emp -> emp.getId().equals(employeeId))
                 .findFirst();
 
-        if (existingEmployee.isPresent()) {
-            existingEmployee.get().setFirstName(employee.getFirstName());
-            existingEmployee.get().setLastName(employee.getLastName());
-            existingEmployee.get().setEmail(employee.getEmail());
-            existingEmployee.get().setPhoneNumber(employee.getPhoneNumber());
-            existingEmployee.get().setHireDate(employee.getHireDate());
-
+        if (existingEmployee.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return employee;
+
+        existingEmployee.get().setFirstName(employee.getFirstName());
+        existingEmployee.get().setLastName(employee.getLastName());
+        existingEmployee.get().setEmail(employee.getEmail());
+        existingEmployee.get().setPhoneNumber(employee.getPhoneNumber());
+        existingEmployee.get().setHireDate(employee.getHireDate());
+
+
+        return new ResponseEntity<Optional<Employee>>(existingEmployee, HttpStatus.OK);
     }
 
 }
