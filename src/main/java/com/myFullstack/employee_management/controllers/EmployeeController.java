@@ -1,6 +1,7 @@
 package com.myFullstack.employee_management.controllers;
 
 import com.myFullstack.employee_management.entities.Employee;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,7 +56,7 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<Employee> createOne(@RequestBody Employee employee) {
+    public ResponseEntity<Employee> createOne(@RequestBody @Valid Employee employee) {
 
         employee.setId(UUID.randomUUID());
         employee.setDepartmentId(UUID.randomUUID());
@@ -80,7 +81,7 @@ public class EmployeeController {
 
     @PutMapping("/{employeeId}")
     public ResponseEntity<Optional<Employee>> updateOne(@PathVariable UUID employeeId,
-                                                        @RequestBody Employee employee) {
+                                                        @RequestBody @Valid Employee employee) {
 
         Optional<Employee> existingEmployee = employees.stream()
                 .filter(emp -> emp.getId().equals(employeeId))
