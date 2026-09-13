@@ -1,6 +1,8 @@
 package com.myFullstack.employee_management.controllers;
 
 import com.myFullstack.employee_management.entities.Employee;
+import com.myFullstack.employee_management.shared.CustomResponseException;
+import com.myFullstack.employee_management.shared.GlobalResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,21 +40,22 @@ public class EmployeeController {
 
 
     @GetMapping
-    public ResponseEntity<ArrayList<Employee>> hello() {
-        return new ResponseEntity<ArrayList<Employee>>(employees, HttpStatus.OK);
+    public ResponseEntity<GlobalResponse<ArrayList<Employee>>> findAll() {
+
+        return new ResponseEntity<>(new GlobalResponse<>(employees), HttpStatus.OK);
 
     }
 
     @GetMapping("/{employeeId}")
-    public ResponseEntity<Employee> findEmployee(@PathVariable UUID employeeId) {
+    public ResponseEntity<GlobalResponse<Employee>> findEmployee(@PathVariable UUID employeeId) {
         Optional<Employee> employee = employees.stream()
                 .filter(emp -> emp.getId().equals(employeeId))
                 .findFirst();
 
         if (employee.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw CustomResponseException.resourceNotFound("employee with id " + employeeId + " not found.");
         }
-        return new ResponseEntity<Employee>(employee.get(), HttpStatus.OK);
+        return new ResponseEntity<>(new GlobalResponse<>(employee.get()), HttpStatus.OK);
     }
 
     @PostMapping
@@ -88,7 +91,7 @@ public class EmployeeController {
                 .findFirst();
 
         if (existingEmployee.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw CustomResponseException.resourceNotFound("employee with id " + employeeId + " not found.");
         }
 
         existingEmployee.get().setFirstName(employee.getFirstName());
