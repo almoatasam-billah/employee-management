@@ -1,5 +1,6 @@
 package com.myFullstack.employee_management.controllers;
 
+import com.myFullstack.employee_management.abstracts.EmployeeService;
 import com.myFullstack.employee_management.entities.Employee;
 import com.myFullstack.employee_management.shared.CustomResponseException;
 import com.myFullstack.employee_management.shared.GlobalResponse;
@@ -18,52 +19,32 @@ import java.util.UUID;
 @RequestMapping("/employees")
 public class EmployeeController {
 
-    ArrayList<Employee> employees = new ArrayList<>(List.of(
-            new Employee(
-                    UUID.randomUUID(),
-                    "Max",
-                    "Mustermann",
-                    "max@example.com",
-                    "017612345678",
-                    LocalDate.of(2023, 5, 10),
-                    UUID.randomUUID()
-            ),
-            new Employee(
-                    UUID.randomUUID(),
-                    "Anna",
-                    "Schmidt",
-                    "anna@example.com",
-                    "015112345679",
-                    LocalDate.of(2024, 1, 15),
-                    UUID.randomUUID()
-            )));
+    private final EmployeeService employeeService;
 
+    
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
 
     @GetMapping
     public ResponseEntity<GlobalResponse<ArrayList<Employee>>> findAll() {
 
+        ArrayList<Employee> employees = employeeService.findAll();
         return new ResponseEntity<>(new GlobalResponse<>(employees), HttpStatus.OK);
 
     }
 
     @GetMapping("/{employeeId}")
-    public ResponseEntity<GlobalResponse<Employee>> findEmployee(@PathVariable UUID employeeId) {
-        Optional<Employee> employee = employees.stream()
-                .filter(emp -> emp.getId().equals(employeeId))
-                .findFirst();
+    public ResponseEntity<GlobalResponse<Employee>> findOne(@PathVariable UUID employeeId) {
 
-        if (employee.isEmpty()) {
-            throw CustomResponseException.resourceNotFound("employee with id " + employeeId + " not found.");
-        }
-        return new ResponseEntity<>(new GlobalResponse<>(employee.get()), HttpStatus.OK);
+        Employee employee = employeeService.findOne(employeeId);
+        return new ResponseEntity<>(new GlobalResponse<>(employee), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<Employee> createOne(@RequestBody @Valid Employee employee) {
 
-        employee.setId(UUID.randomUUID());
-        employee.setDepartmentId(UUID.randomUUID());
-        employees.add(employee);
+        employeeService.createOne(employee);
 
         return new ResponseEntity<Employee>(employee, HttpStatus.CREATED);
     }
@@ -71,13 +52,7 @@ public class EmployeeController {
     @DeleteMapping("/{employeeId}")
     public ResponseEntity<Void> deleteOne(@PathVariable UUID employeeId) {
 
-        Optional<Employee> employee = employees.stream()
-                .filter(emp -> emp.getId().equals(employeeId))
-                .findFirst();
-
-        if (employee.isPresent()) {
-            employees.remove(employee.get());
-        }
+        employeeService.deleteOne(employeeId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -86,22 +61,9 @@ public class EmployeeController {
     public ResponseEntity<Optional<Employee>> updateOne(@PathVariable UUID employeeId,
                                                         @RequestBody @Valid Employee employee) {
 
-        Optional<Employee> existingEmployee = employees.stream()
-                .filter(emp -> emp.getId().equals(employeeId))
-                .findFirst();
+        Optional<Employee> updatedEmployee = employeeService.updateOne(employeeId, employee);
 
-        if (existingEmployee.isEmpty()) {
-            throw CustomResponseException.resourceNotFound("employee with id " + employeeId + " not found.");
-        }
-
-        existingEmployee.get().setFirstName(employee.getFirstName());
-        existingEmployee.get().setLastName(employee.getLastName());
-        existingEmployee.get().setEmail(employee.getEmail());
-        existingEmployee.get().setPhoneNumber(employee.getPhoneNumber());
-        existingEmployee.get().setHireDate(employee.getHireDate());
-
-
-        return new ResponseEntity<Optional<Employee>>(existingEmployee, HttpStatus.OK);
+        return new ResponseEntity<Optional<Employee>>(updatedEmployee, HttpStatus.OK);
     }
 
 }
