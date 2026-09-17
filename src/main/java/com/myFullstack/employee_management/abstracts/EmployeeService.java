@@ -1,5 +1,7 @@
 package com.myFullstack.employee_management.abstracts;
 
+import com.myFullstack.employee_management.dtos.EmployeeCreate;
+import com.myFullstack.employee_management.dtos.EmployeeUpdate;
 import com.myFullstack.employee_management.entities.Employee;
 import jakarta.validation.Valid;
 
@@ -17,7 +19,7 @@ public interface EmployeeService {
 
     void deleteOne(UUID employeeId);
 
-    Optional<Employee> updateOne(UUID employeeId, Employee employee);
+    Optional<Employee> updateOne(UUID employeeId, EmployeeUpdate employee);
 
-    Employee createOne(Employee employee);
+    Employee createOne(EmployeeCreate employee);
 }

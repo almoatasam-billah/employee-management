@@ -1,6 +1,8 @@
 package com.myFullstack.employee_management.services;
 
 import com.myFullstack.employee_management.abstracts.EmployeeService;
+import com.myFullstack.employee_management.dtos.EmployeeCreate;
+import com.myFullstack.employee_management.dtos.EmployeeUpdate;
 import com.myFullstack.employee_management.entities.Employee;
 import com.myFullstack.employee_management.shared.CustomResponseException;
 import org.springframework.stereotype.Service;
@@ -66,7 +68,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Optional<Employee> updateOne(UUID employeeId, Employee employee) {
+    public Optional<Employee> updateOne(UUID employeeId, EmployeeUpdate employee) {
 
         Optional<Employee> existingEmployee = employees.stream()
                 .filter(emp -> emp.getId().equals(employeeId))
@@ -76,19 +78,25 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw CustomResponseException.resourceNotFound("employee with id " + employeeId + " not found.");
         }
 
-        existingEmployee.get().setFirstName(employee.getFirstName());
-        existingEmployee.get().setLastName(employee.getLastName());
-        existingEmployee.get().setEmail(employee.getEmail());
-        existingEmployee.get().setPhoneNumber(employee.getPhoneNumber());
-        existingEmployee.get().setHireDate(employee.getHireDate());
+        existingEmployee.get().setFirstName(employee.firstName());
+        existingEmployee.get().setLastName(employee.lastName());
+        existingEmployee.get().setPhoneNumber(employee.phoneNumber());
 
         return existingEmployee;
     }
 
     @Override
-    public Employee createOne(Employee employee) {
+    public Employee createOne(EmployeeCreate employeeCreate) {
+        Employee employee = new Employee();
+
         employee.setId(UUID.randomUUID());
         employee.setDepartmentId(UUID.randomUUID());
+        employee.setFirstName(employeeCreate.firstName());
+        employee.setLastName(employeeCreate.lastName());
+        employee.setEmail(employeeCreate.email());
+        employee.setPhoneNumber(employeeCreate.phoneNumber());
+        employee.setHireDate(employeeCreate.hireDate());
+
         employees.add(employee);
 
         return employee;

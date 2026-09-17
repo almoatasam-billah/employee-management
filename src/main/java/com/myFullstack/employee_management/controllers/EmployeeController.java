@@ -1,6 +1,8 @@
 package com.myFullstack.employee_management.controllers;
 
 import com.myFullstack.employee_management.abstracts.EmployeeService;
+import com.myFullstack.employee_management.dtos.EmployeeCreate;
+import com.myFullstack.employee_management.dtos.EmployeeUpdate;
 import com.myFullstack.employee_management.entities.Employee;
 import com.myFullstack.employee_management.shared.CustomResponseException;
 import com.myFullstack.employee_management.shared.GlobalResponse;
@@ -21,7 +23,7 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    
+
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
@@ -42,9 +44,9 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<Employee> createOne(@RequestBody @Valid Employee employee) {
+    public ResponseEntity<Employee> createOne(@RequestBody @Valid EmployeeCreate employeeCreate) {
 
-        employeeService.createOne(employee);
+        Employee employee = employeeService.createOne(employeeCreate);
 
         return new ResponseEntity<Employee>(employee, HttpStatus.CREATED);
     }
@@ -59,7 +61,7 @@ public class EmployeeController {
 
     @PutMapping("/{employeeId}")
     public ResponseEntity<Optional<Employee>> updateOne(@PathVariable UUID employeeId,
-                                                        @RequestBody @Valid Employee employee) {
+                                                        @RequestBody @Valid EmployeeUpdate employee) {
 
         Optional<Employee> updatedEmployee = employeeService.updateOne(employeeId, employee);
 
