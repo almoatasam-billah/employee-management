@@ -29,9 +29,9 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<GlobalResponse<ArrayList<Employee>>> findAll() {
+    public ResponseEntity<GlobalResponse<List<Employee>>> findAll() {
 
-        ArrayList<Employee> employees = employeeService.findAll();
+        List<Employee> employees = employeeService.findAll();
         return new ResponseEntity<>(new GlobalResponse<>(employees), HttpStatus.OK);
 
     }

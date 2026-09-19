@@ -15,7 +15,7 @@ public interface EmployeeService {
 
     Employee findOne(UUID employeeId);
 
-    ArrayList<Employee> findAll();
+    List<Employee> findAll();
 
     void deleteOne(UUID employeeId);
 
