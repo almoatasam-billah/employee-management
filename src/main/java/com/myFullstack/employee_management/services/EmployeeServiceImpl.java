@@ -60,6 +60,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         existingEmployee.get().setLastName(employee.lastName());
         existingEmployee.get().setPhoneNumber(employee.phoneNumber());
 
+        employeeRepo.save(existingEmployee.get());
+
         return existingEmployee;
     }
 
