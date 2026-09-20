@@ -1,5 +1,6 @@
 package com.myFullstack.employee_management.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -41,8 +42,14 @@ public class Employee {
     @Column(name = "hire_date", nullable = false)
     private LocalDate hireDate;
 
-    @Column(name = "department_id", nullable = false)
-    private UUID departmentId = UUID.randomUUID();
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "department_id", nullable = false)
+    @JsonProperty("departmentId")
+    private Department department;
+
+    public UUID getDepartment() {
+        return department.getId();
+    }
 
 
 }

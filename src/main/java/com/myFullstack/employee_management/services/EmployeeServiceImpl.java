@@ -3,7 +3,9 @@ package com.myFullstack.employee_management.services;
 import com.myFullstack.employee_management.abstracts.EmployeeService;
 import com.myFullstack.employee_management.dtos.EmployeeCreate;
 import com.myFullstack.employee_management.dtos.EmployeeUpdate;
+import com.myFullstack.employee_management.entities.Department;
 import com.myFullstack.employee_management.entities.Employee;
+import com.myFullstack.employee_management.repositories.DepartmentRepo;
 import com.myFullstack.employee_management.repositories.EmployeeRepo;
 import com.myFullstack.employee_management.shared.CustomResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeRepo employeeRepo;
+
+    @Autowired
+    private DepartmentRepo departmentRepo;
 
     @Override
     public Employee findOne(UUID employeeId) {
@@ -69,11 +74,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee createOne(EmployeeCreate employeeCreate) {
         Employee employee = new Employee();
 
+        Optional<Department> department = departmentRepo.findById(employeeCreate.departmentId());
+        if (department.isEmpty()) {
+            throw CustomResponseException.resourceNotFound("department with id " + employeeCreate.departmentId() + " not found.");
+        }
+
+
         employee.setFirstName(employeeCreate.firstName());
         employee.setLastName(employeeCreate.lastName());
         employee.setEmail(employeeCreate.email());
         employee.setPhoneNumber(employeeCreate.phoneNumber());
         employee.setHireDate(employeeCreate.hireDate());
+        employee.setDepartment(department.get());
 
 
         employeeRepo.save(employee);
